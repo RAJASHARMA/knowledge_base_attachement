@@ -5,7 +5,7 @@ const {
     createUser,
     findUserByEmail,
     findUserById
-} = require("../models/userModel");
+} = require("../models/user");
 
 
 const generateToken = (userId) => {
@@ -19,6 +19,7 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
     try {
+        console.log(req.body)
         const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
@@ -92,7 +93,7 @@ const register = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Internal server error"
+            message: `Internal server error: ${error.message}`
         });
     }
 };
@@ -159,8 +160,35 @@ const login = async (req, res) => {
     }
 };
 
+const getProfile = async (req, res) => {
+    try {
+        const user = await findUserById(req.user.id);
+        console.log(req)
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: user
+        });
+
+    } catch (error) {
+        console.error("Profile error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
 
 module.exports = {
     register,
-    login
+    login,
+    getProfile
 };
