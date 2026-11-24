@@ -1,0 +1,33 @@
+const { Pool } = require("pg");
+
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+});
+
+pool.on("connect", () => {
+    console.log("PostgreSQL client connected");
+});
+
+pool.on("error", (err) => {
+    console.error("Unexpected PostgreSQL error:", err);
+});
+
+const connectDB = async () => {
+    try {
+        const result = await pool.query("SELECT NOW()");
+        console.log("PostgreSQL connected successfully");
+        console.log("Database time:", result.rows[0].now);
+    } catch (error) {
+        console.error("PostgreSQL connection failed:", error.message);
+        throw error;
+    }
+};
+
+module.exports = {
+    pool,
+    connectDB,
+};
